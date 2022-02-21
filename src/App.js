@@ -8,12 +8,14 @@ function App() {
   const [index, setIndex] = useState();
   const [network, setNetwork] = useState("mainnet");
 
+  const host =
+    process.env.NODE_ENV === "development" ? "http://localhost:3001" : "";
+
   useEffect(() => {
     async function fetchList() {
       try {
         const url =
-          `http://localhost:3001/?network=${network}` +
-          (!!index ? `&index=${index}` : "");
+          `${host}/api?network=${network}` + (!!index ? `&index=${index}` : "");
 
         const resp = await axios.get(url);
         const metadata = resp.data;
@@ -25,7 +27,7 @@ function App() {
     }
 
     fetchList();
-  }, [index, network]);
+  }, [index, network, host]);
 
   const changeNetwork = (e) => {
     setIndex(null);

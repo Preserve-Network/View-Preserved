@@ -25,7 +25,7 @@ const getFileUrl = (cid, filename) => {
   return `https://${cid}.${gateway}/${filename}`;
 };
 
-app.get("/", async (req, res) => {
+app.get("/api", async (req, res) => {
   const network = req.query.network || "mumbai";
   const index = req.query.index;
 

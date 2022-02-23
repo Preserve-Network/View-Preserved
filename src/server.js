@@ -28,8 +28,12 @@ const getFileUrl = (cid, filename) => {
 app.get("/api", async (req, res) => {
   const network = req.query.network || "mumbai";
   const index = req.query.index;
+  const contract =
+    req.query.contract || network === "mainnet"
+      ? "0x7db36be76c97fdb9d15fdfd7331ef29ed8bcb742"
+      : "0x7d6b76E5Ab4e72E872a0E08198eA0c3b7B81E9De";
 
-  const preserve = new Preserve(network);
+  const preserve = new Preserve(network, contract);
 
   const cid = !!index
     ? await preserve.getValueAtIndex(index)
@@ -37,7 +41,12 @@ app.get("/api", async (req, res) => {
 
   const metadata = await getMetadataForCID(cid);
 
-  const fileList = metadata.filenames.map((file) => getFileUrl(cid, file));
+  const fileList = metadata.filenames.map((file) => {
+    return {
+      name: file,
+      url: getFileUrl(cid, file),
+    };
+  });
   const indexLength = await preserve.getIndexLength();
 
   metadata.filenames = fileList;

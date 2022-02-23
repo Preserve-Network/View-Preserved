@@ -13,3 +13,13 @@
 .table{
   padding-top:20px;
 }
+
+.contractInput {
+  width:400px !important;
+  display: inline !important;
+  margin-right: 10px;
+}
+
+.errorMessage {
+  color: red;
+}

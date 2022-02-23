@@ -14,27 +14,37 @@ function App() {
   const [metadata, setMetadata] = useState();
   const [index, setIndex] = useState();
   const [network, setNetwork] = useState("mainnet");
+  const [contract, setContract] = useState("");
+  const [error, setError] = useState(null);
 
   const host =
     process.env.NODE_ENV === "development" ? "http://localhost:3001" : "";
 
   useEffect(() => {
     async function fetchList() {
+      setError(null);
       try {
         const url =
-          `${host}/api?network=${network}` + (!!index ? `&index=${index}` : "");
+          `${host}/api?network=${network}&contract=${contract}` +
+          (!!index ? `&index=${index}` : "");
 
         const resp = await axios.get(url);
         const metadata = resp.data;
 
         setMetadata(metadata);
       } catch (err) {
-        console.error(err);
+        setError(
+          "Failed to fetch the contract, please double check the network and contract address are correct."
+        );
       }
     }
 
-    fetchList();
-  }, [index, network, host]);
+    if (contract.length === 42 && contract.startsWith("0x")) {
+      fetchList();
+    } else {
+      setMetadata(null);
+    }
+  }, [index, network, host, contract]);
 
   const changeNetwork = (eventKey, event) => {
     setIndex(null);
@@ -43,6 +53,10 @@ function App() {
 
   const changeIndex = (eventKey, event) => {
     setIndex(eventKey);
+  };
+
+  const updateContract = (e) => {
+    setContract(e.target.value);
   };
 
   const createdDate = metadata ? new Date(metadata.created).toString() : "-";
@@ -69,13 +83,16 @@ function App() {
             </Dropdown.Menu>
           </Dropdown>
         </Col>
-        <Col xs lg="4">
+        <Col xs lg="9">
           <Form.Control
-            placeholder="
-            Index Contract Address"
+            placeholder="Index Contract Address"
+            className="contractInput"
+            value={contract}
+            onChange={updateContract}
           />
         </Col>
       </Row>
+      <Row className="errorMessage">{error}</Row>
       <hr />
       <Row>
         <Col xs lg="3">

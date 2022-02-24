@@ -21,6 +21,14 @@ function App() {
     process.env.NODE_ENV === "development" ? "http://localhost:3001" : "";
 
   useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const queryContract = queryParams.get("contract");
+    if (!!queryContract) {
+      setContract(queryContract);
+    }
+  }, []);
+
+  useEffect(() => {
     async function fetchList() {
       setError(null);
       try {

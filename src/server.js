@@ -26,13 +26,16 @@ const getFileUrl = (cid, filename) => {
 };
 
 app.get("/api", async (req, res) => {
-  const network = req.query.network || "mumbai";
+  const network = req.query.network;
   const index = req.query.index;
-  const contract = req.query.contract
-    ? req.query.contract
-    : network === "mainnet"
-    ? "0x7db36be76c97fdb9d15fdfd7331ef29ed8bcb742"
-    : "0x7d6b76E5Ab4e72E872a0E08198eA0c3b7B81E9De";
+  const contract = req.query.contract;
+
+  if (!network || !contract) {
+    return res.status(400).send({
+      status: 400,
+      error: "Network and contract are required.",
+    });
+  }
 
   const preserve = new Preserve(network, contract);
 

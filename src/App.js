@@ -49,6 +49,7 @@ function App() {
   const changeNetwork = (eventKey, event) => {
     setIndex(null);
     setNetwork(eventKey);
+    setContract("");
   };
 
   const changeIndex = (eventKey, event) => {
@@ -59,11 +60,25 @@ function App() {
     setContract(e.target.value);
   };
 
-  const createdDate = metadata ? new Date(metadata.created).toString() : "-";
+  const selectContract = (eventKey, event) => {
+    switch (eventKey) {
+      case "sitesnapshot":
+        const contractAddress =
+          network === "mainnet"
+            ? "0x7db36be76c97fdb9d15fdfd7331ef29ed8bcb742"
+            : "0x7d6b76E5Ab4e72E872a0E08198eA0c3b7B81E9De";
+        setContract(contractAddress);
+        break;
+      default:
+        setContract("");
+    }
+  };
+
+  const createdDate = metadata ? new Date(metadata.created).toString() : null;
   const maxIndex = metadata ? metadata.indexLength - 1 : 0;
 
   return (
-    <Container>
+    <Container className="container">
       <Row>
         <h1>View Preserved Files</h1>
         <p>
@@ -78,8 +93,8 @@ function App() {
               Network: Polygon {network}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item eventKey="mainnet">mainnet</Dropdown.Item>
-              <Dropdown.Item eventKey="mumbai">mumbai</Dropdown.Item>
+              <Dropdown.Item eventKey="mainnet">Polygon mainnet</Dropdown.Item>
+              <Dropdown.Item eventKey="mumbai">Polygon mumbai</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Col>
@@ -90,50 +105,70 @@ function App() {
             value={contract}
             onChange={updateContract}
           />
+          <span className="or">OR</span>
+          <Dropdown
+            onSelect={selectContract}
+            value={network}
+            className="contractOptions"
+          >
+            <Dropdown.Toggle className="dropdown" id="dropdown-basic">
+              Offical Contracts
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item eventKey="sitesnapshot">
+                Site Snapshots
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </Col>
       </Row>
       <Row className="errorMessage">{error}</Row>
       <hr />
-      <Row>
-        <Col xs lg="3">
-          <Dropdown onSelect={changeIndex} value={index}>
-            <Dropdown.Toggle
-              className="dropdown"
-              variant="success"
-              id="dropdown-basic"
-            >
-              Index Entry: {index || `${maxIndex}`}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {Array.from(Array(maxIndex + 1), (e, i) => {
-                return (
-                  <Dropdown.Item key={i} eventKey={i}>
-                    {i}
-                  </Dropdown.Item>
-                );
-              }).reverse()}
-            </Dropdown.Menu>
-          </Dropdown>
-        </Col>
-        <Col>
-          <b>Indexed on:</b> {createdDate}
-        </Col>
-      </Row>
-      <Row className="table">
-        <ListGroup>
-          {metadata &&
-            metadata.filenames &&
-            metadata.filenames.map((file) => {
-              return (
-                <ListGroup.Item key={file.name}>
-                  <a href={file.url} rel="noreferrer" target="_blank">
-                    {file.name}
-                  </a>
-                </ListGroup.Item>
-              );
-            })}
-        </ListGroup>
-      </Row>
+
+      {!!metadata && (
+        <>
+          <Row>
+            <Col xs lg="3">
+              <Dropdown onSelect={changeIndex} value={index}>
+                <Dropdown.Toggle
+                  className="dropdown"
+                  variant="success"
+                  id="dropdown-basic"
+                >
+                  Index Entry: {index || `${maxIndex}`}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {Array.from(Array(maxIndex + 1), (e, i) => {
+                    return (
+                      <Dropdown.Item key={i} eventKey={i}>
+                        {i}
+                      </Dropdown.Item>
+                    );
+                  }).reverse()}
+                </Dropdown.Menu>
+              </Dropdown>
+            </Col>
+            <Col>
+              <b>Indexed on:</b> {createdDate}
+            </Col>
+          </Row>
+          <Row className="table">
+            <ListGroup>
+              {metadata &&
+                metadata.filenames &&
+                metadata.filenames.map((file) => {
+                  return (
+                    <ListGroup.Item key={file.name}>
+                      <a href={file.url} rel="noreferrer" target="_blank">
+                        {file.name}
+                      </a>
+                    </ListGroup.Item>
+                  );
+                })}
+            </ListGroup>
+          </Row>
+        </>
+      )}
     </Container>
   );
 }
